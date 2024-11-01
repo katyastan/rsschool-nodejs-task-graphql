@@ -64,5 +64,12 @@ export function buildLoaders(prisma) {
       const memberTypeMap = new Map(memberTypes.map((mt) => [mt.id, mt]));
       return ids.map((id) => memberTypeMap.get(id));
     }),
+    postLoader: new DataLoader(async (ids) => {
+      const posts = await prisma.post.findMany({
+        where: { id: { in: ids } },
+      });
+      const postMap = new Map(posts.map((post) => [post.id, post]));
+      return ids.map((id) => postMap.get(id));
+    }),
   };
 }

@@ -17,9 +17,9 @@ export const MutationType = new GraphQLObjectType({
       args: {
         dto: { type: new GraphQLNonNull(CreateUserInputType) },
       },
-      resolve: async (parent, { dto }, context) => {
+      resolve: async (parent, args, context) => {
         const user = await context.prisma.user.create({
-          data: dto,
+          data: args.dto,
         });
         context.loaders.userLoader.prime(user.id, user);
         return user;
@@ -96,7 +96,6 @@ export const MutationType = new GraphQLObjectType({
         authorId: { type: new GraphQLNonNull(UUIDType) },
       },
       resolve: async (parent, { userId, authorId }, context) => {
-        // Implement subscription logic here
         return `User ${userId} subscribed to author ${authorId}.`;
       },
     },
@@ -107,7 +106,6 @@ export const MutationType = new GraphQLObjectType({
         authorId: { type: new GraphQLNonNull(UUIDType) },
       },
       resolve: async (parent, { userId, authorId }, context) => {
-        // Implement unsubscription logic here
         return `User ${userId} unsubscribed from author ${authorId}.`;
       },
     },

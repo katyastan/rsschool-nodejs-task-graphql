@@ -9,24 +9,18 @@ import { MemberTypeIdEnum } from './memberType.js';
 export const RootQueryType = new GraphQLObjectType({
   name: 'RootQueryType',
   fields: {
-    // memberTypes: {
-    //   type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MemberType))),
-    //   resolve: async (parent, args, context) => {
-    //     return context.prisma.memberType.findMany();
-    //   },
-    // },
     memberTypes: {
-        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MemberType))),
-        resolve: async (parent, args, context) => {
-          try {
-            const memberTypes = await context.prisma.memberType.findMany();
-            return memberTypes;
-          } catch (error) {
-            console.error('Error in memberTypes resolver:', error);
-            throw error;
-          }
-        },
+      type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MemberType))),
+      resolve: async (parent, args, context) => {
+        try {
+          const memberTypes = await context.prisma.memberType.findMany();
+          return memberTypes;
+        } catch (error) {
+          console.error('Error in memberTypes resolver:', error);
+          throw error;
+        }
       },
+    },
     memberType: {
       type: MemberType,
       args: {
