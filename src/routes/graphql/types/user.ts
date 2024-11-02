@@ -18,9 +18,6 @@ export const UserType = new GraphQLObjectType({
     profile: {
       type: ProfileType,
       resolve: async (parent, args, context) => {
-        if (parent.profile) {
-          return parent.profile;
-        }
         const { profileLoader } = context.loaders;
         return profileLoader.load(parent.id);
       },
@@ -28,9 +25,6 @@ export const UserType = new GraphQLObjectType({
     posts: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(PostType))),
       resolve: async (parent, args, context) => {
-        if (parent.posts) {
-          return parent.posts;
-        }
         const { postsByAuthorIdLoader } = context.loaders;
         return postsByAuthorIdLoader.load(parent.id);
       },
@@ -43,7 +37,8 @@ export const UserType = new GraphQLObjectType({
           const authors = await context.loaders.userLoader.loadMany(authorIds);
           return authors;
         }
-        return context.loaders.userSubscribedToLoader.load(parent.id);
+        const { userSubscribedToLoader } = context.loaders;
+        return userSubscribedToLoader.load(parent.id);
       },
     },
     subscribedToUser: {
@@ -54,7 +49,8 @@ export const UserType = new GraphQLObjectType({
           const subscribers = await context.loaders.userLoader.loadMany(subscriberIds);
           return subscribers;
         }
-        return context.loaders.subscribedToUserLoader.load(parent.id);
+        const { subscribedToUserLoader } = context.loaders;
+        return subscribedToUserLoader.load(parent.id);
       },
     },
   }),
