@@ -5,6 +5,7 @@ import { ProfileType } from './profile.js';
 import { MemberType } from './memberType.js';
 import { UUIDType } from './uuid.js';
 import { MemberTypeIdEnum } from './memberType.js';
+import { parseResolveInfo } from 'graphql-parse-resolve-info';
 
 export const RootQueryType = new GraphQLObjectType({
   name: 'RootQueryType',
@@ -32,8 +33,29 @@ export const RootQueryType = new GraphQLObjectType({
     },
     users: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType))),
-      resolve: async (parent, args, context) => {
-        const users = await context.prisma.user.findMany();
+      resolve: async (parent, args, context, info) => {
+        const parsedInfo = parseResolveInfo(info);
+        if (!parsedInfo?.fieldsByTypeName.User) {
+          return context.prisma.user.findMany();
+        }
+
+        const fields = parsedInfo.fieldsByTypeName.User;
+
+        const include: any = {};
+        if (fields['profile']) {
+          include.profile = true;
+        }
+        if (fields['posts']) {
+          include.posts = true;
+        }
+        if (fields['userSubscribedTo']) {
+          include.userSubscribedTo = true;
+        }
+        if (fields['subscribedToUser']) {
+          include.subscribedToUser = true;
+        }
+
+        const users = await context.prisma.user.findMany({ include });
         users.forEach((user) => {
           context.loaders.userLoader.prime(user.id, user);
         });
